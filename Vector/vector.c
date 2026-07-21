@@ -1,9 +1,5 @@
 #include "vector.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 Vector* vectorCreate(const unsigned int initial_capacity, const unsigned int item_size) {
     Vector* v = (Vector*)malloc(sizeof(Vector));
 
@@ -18,9 +14,9 @@ Vector* vectorCreate(const unsigned int initial_capacity, const unsigned int ite
     v->capacity = initial_capacity;
     v->item_size = item_size;
 
-    v->data = malloc(initial_capacity * item_size);
+    v->buffer = malloc(initial_capacity * item_size);
 
-    if (v->data == NULL) {
+    if (v->buffer == NULL) {
         perror(
             "[vector.c][createVector()] ERROR: Failed to allocate memory for the vector dada.\n");
         free(v);
@@ -38,9 +34,9 @@ void vectorPushBack(Vector* vector, const void* value) {
 
     if (vector->size == vector->capacity) {
         vector->capacity = vector->capacity * 2 > 0 ? vector->capacity * 2 : 1;
-        vector->data = realloc(vector->data, vector->capacity * vector->item_size);
+        vector->buffer = realloc(vector->buffer, vector->capacity * vector->item_size);
 
-        if (vector->data == NULL) {
+        if (vector->buffer == NULL) {
             perror(
                 "[vector.c][vectorPushBack()] ERROR: Failed to allocate memory for the vector "
                 "items.\n");
@@ -48,7 +44,7 @@ void vectorPushBack(Vector* vector, const void* value) {
         }
     }
     // Calculates the address to which the new element should be copied
-    char* dest = (char*)vector->data + vector->size * vector->item_size;
+    char* dest = (char*)vector->buffer + vector->size * vector->item_size;
     memcpy(dest, value, vector->item_size);
     vector->size += 1;
 }
@@ -64,7 +60,7 @@ void* vectorGet(const Vector* vector, const unsigned int index) {
         return NULL;
     }
     // Calculates the desired item address
-    return (char*)vector->data + index * vector->item_size;
+    return (char*)vector->buffer + index * vector->item_size;
 }
 
 void vectorSet(Vector* vector, const unsigned int index, const void* value) {
@@ -78,7 +74,7 @@ void vectorSet(Vector* vector, const unsigned int index, const void* value) {
         return;
     }
     // Calculates the to be modified item address
-    char* dest = (char*)vector->data + index * vector->item_size;
+    char* dest = (char*)vector->buffer + index * vector->item_size;
     memcpy(dest, value, vector->item_size);
 }
 
@@ -95,7 +91,7 @@ void vectorErase(Vector* vector, const unsigned int index) {
 
     // Moves next items backwards
     for (int i = index + 1; i < vector->size; ++i) {
-        vectorSet(vector, i - 1, vector->data + vector->item_size * i);
+        vectorSet(vector, i - 1, vector->buffer + vector->item_size * i);
     }
 
     vector->size -= 1;
@@ -123,6 +119,6 @@ void vectorFree(Vector* vector) {
         return;
     }
 
-    free(vector->data);
+    free(vector->buffer);
     free(vector);
 }
