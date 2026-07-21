@@ -1,14 +1,13 @@
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "lista.h"
-#include <assert.h>
 
-void printInt(void *data) {
-    printf("%d\n", *(int*)data);
-}
+#include "linked_list.h"
+
+void printInt(void* data) { printf("%d\n", *(int*)data); }
 
 void testForEach() {
-    LinkedList *list = createList();
+    LinkedList* list = createList();
     int values[] = {5, 10, 15};
 
     for (int i = 0; i < 3; i++) {
@@ -19,8 +18,8 @@ void testForEach() {
     freeList(list);
 }
 
-int main(){
-    LinkedList *list = createList();
+int main() {
+    LinkedList* list = createList();
     int values[] = {10, 20, 30};
 
     for (int i = 0; i < 3; i++) {
@@ -28,7 +27,7 @@ int main(){
     }
 
     // Remove o segundo nó (valor 20)
-    ListNode *target = list->head->next;
+    ListNode* target = list->head->next;
     linkedListPopNode(list, target);
 
     assert(listSize(list) == 2);

@@ -1,22 +1,20 @@
-#include <stdlib.h>
+#include "linked_list.h"
+
 #include <stdio.h>
-#include "lista.h"
+#include <stdlib.h>
 
-
-int listIsEmpty(const LinkedList *list){
+int listIsEmpty(const LinkedList* list) {
     return list == NULL || list->head == NULL || list->size == 0;
 }
 
-int listSize(const LinkedList *list){
-    return list == NULL ? 0 : list->size;
-}
+int listSize(const LinkedList* list) { return list == NULL ? 0 : list->size; }
 
-LinkedList* createList(void){
+LinkedList* createList(void) {
     // Cria uma nova lista encadeada e insere um nó inicial nela
-    LinkedList *new_list = (LinkedList*) malloc(sizeof(LinkedList));
+    LinkedList* new_list = (LinkedList*)malloc(sizeof(LinkedList));
 
     // Verifica se foi possível alocar memória para a lista encadeada
-    if(new_list == NULL){
+    if (new_list == NULL) {
         printf("Erro ao alocar memoria para lista encadeada.");
         return NULL;
     }
@@ -28,15 +26,15 @@ LinkedList* createList(void){
     return new_list;
 }
 
-void freeList(LinkedList *list){
+void freeList(LinkedList* list) {
     // Verifica se a lista já se encontra vazia
-    if(list == NULL) return;
+    if (list == NULL) return;
 
-    struct ListNode *curr = list->head;
-    struct ListNode *next;
+    struct ListNode* curr = list->head;
+    struct ListNode* next;
 
     // Realiza a remoção dos nós a partir do início
-    while(curr != NULL){
+    while (curr != NULL) {
         next = curr->next;
         free(curr);
         curr = next;
@@ -45,25 +43,24 @@ void freeList(LinkedList *list){
     free(list);
 }
 
-void freeListComplete(LinkedList *list, void (*freeData)(void*)){
+void freeListComplete(LinkedList* list, void (*freeData)(void*)) {
     // Verifica se a função passada é válida
-    if(freeData == NULL){
+    if (freeData == NULL) {
         printf("Erro. A funcao passada nao e valida.\n");
         return;
     }
 
     // Verifica se a lista já se encontra vazia
-    if(list == NULL) return;
+    if (list == NULL) return;
 
-    struct ListNode *curr = list->head;
-    struct ListNode *next;
+    struct ListNode* curr = list->head;
+    struct ListNode* next;
 
-    while(curr != NULL){
+    while (curr != NULL) {
         next = curr->next;
 
         // Verifica se o dado armazenado existe
-        if(curr->data != NULL)
-            freeData(curr->data);
+        if (curr->data != NULL) freeData(curr->data);
 
         free(curr);
         curr = next;
@@ -72,19 +69,19 @@ void freeListComplete(LinkedList *list, void (*freeData)(void*)){
     free(list);
 }
 
-void linkedListPushBack(LinkedList *list, void *data){
-    struct ListNode *new_node = (struct ListNode*) malloc(sizeof(struct ListNode));
+void linkedListPushBack(LinkedList* list, void* data) {
+    struct ListNode* new_node = (struct ListNode*)malloc(sizeof(struct ListNode));
 
     // Verifica se o novo nó foi alocado com sucesso
-    if(new_node == NULL){
+    if (new_node == NULL) {
         printf("Erro ao alocar memoria para um novo no.\n");
         return;
     }
 
-    struct ListNode *curr = list->tail;
+    struct ListNode* curr = list->tail;
 
     // Verifica se existe algum nó na lista
-    if(curr){
+    if (curr) {
         curr->next = new_node;
 
         new_node->data = data;
@@ -98,25 +95,25 @@ void linkedListPushBack(LinkedList *list, void *data){
         // Caso a lista não possua nó cabeça, é chamada linkedListPushFront para
         // fazer a inserção no início
 
-        free(new_node); // Libera o nó alocado anteriormente
+        free(new_node);  // Libera o nó alocado anteriormente
         linkedListPushFront(list, data);
     }
 }
 
-void linkedListPushFront(LinkedList *list, void *data){
-    struct ListNode *new_node = (struct ListNode*) malloc(sizeof(struct ListNode));
+void linkedListPushFront(LinkedList* list, void* data) {
+    struct ListNode* new_node = (struct ListNode*)malloc(sizeof(struct ListNode));
 
     // Verifica se a memória foi alocada com sucesso para o novo nó
-    if(new_node == NULL){
+    if (new_node == NULL) {
         printf("Erro ao alocar memoria para um novo no.\n");
         return;
     }
 
-    new_node->previous = NULL; // Nó cabeça não possui antecessor
+    new_node->previous = NULL;  // Nó cabeça não possui antecessor
     new_node->data = data;
 
     // Verifica se a lista possuí um nó cabeça
-    if(list->head){
+    if (list->head) {
         new_node->next = list->head;
         list->head->previous = new_node;
         list->head = new_node;
@@ -131,17 +128,17 @@ void linkedListPushFront(LinkedList *list, void *data){
     list->size += 1;
 }
 
-void* linkedListPopFront(LinkedList *list){
-    if(listIsEmpty(list)){
+void* linkedListPopFront(LinkedList* list) {
+    if (listIsEmpty(list)) {
         printf("Erro ao tentar remover em uma lista vazia.\n");
         return NULL;
     }
 
-    struct ListNode *curr = list->head;
+    struct ListNode* curr = list->head;
     list->head = list->head->next;
 
     // Verifica se o posterior ao nó cabeça existe
-    if(list->head != NULL){
+    if (list->head != NULL) {
         // Faz com que o novo nó cabeça não aponte para nenhum anterior
         list->head->previous = NULL;
 
@@ -151,23 +148,23 @@ void* linkedListPopFront(LinkedList *list){
         list->size = 0;
     }
 
-    void *data = curr->data;
+    void* data = curr->data;
     free(curr);
     return data;
 }
 
-void* linkedListPopBack(LinkedList *list){
+void* linkedListPopBack(LinkedList* list) {
     // Verifica se a lista está vazia
-    if(listIsEmpty(list)){
+    if (listIsEmpty(list)) {
         printf("Erro ao remover no da lista. A lista esta vazia.\n");
         return NULL;
     }
 
-    struct ListNode *curr = list->tail;
+    struct ListNode* curr = list->tail;
 
     // Verifica se o último nó da lista possui antecessor
-    if(curr->previous){
-        void *data = curr->data;
+    if (curr->previous) {
+        void* data = curr->data;
         curr = curr->previous;
 
         free(curr->next);
@@ -176,7 +173,7 @@ void* linkedListPopBack(LinkedList *list){
         list->size -= 1;
         return data;
     } else {
-        void *data = curr->data;
+        void* data = curr->data;
         free(curr);
         list->head = NULL;
         list->tail = NULL;
@@ -185,27 +182,27 @@ void* linkedListPopBack(LinkedList *list){
     }
 }
 
-void* linkedListPopNode(LinkedList *list, struct ListNode *target){
+void* linkedListPopNode(LinkedList* list, struct ListNode* target) {
     // Verifica se a lista está vazia
-    if(listIsEmpty(list)){
+    if (listIsEmpty(list)) {
         printf("Erro ao tentar remover no da lista. A lista esta vazia.\n");
         return NULL;
     }
 
-    struct ListNode *curr;
+    struct ListNode* curr;
 
     // Caso o nó a ser removido esteja entre dois nós existentes
-    if(target->next && target->previous){
+    if (target->next && target->previous) {
         // Faz os nós entre o nó a ser removido apontarem um para o outro
         curr = target->next;
         target->previous->next = curr;
         curr->previous = target->previous;
 
-    } else if (target->next){
+    } else if (target->next) {
         // Se o nó a ser removido apenas possuir posterior, ele é o nó cabeça
         list->head = target->next;
         list->head->previous = NULL;
-    } else if (target->previous){
+    } else if (target->previous) {
         // Se o nó a ser removido possuir apenas anterior, ele é o nó final
         // da lista
         target->previous->next = NULL;
@@ -224,17 +221,17 @@ void* linkedListPopNode(LinkedList *list, struct ListNode *target){
     return data;
 }
 
-void linkedListForEach(const LinkedList *list, void(*func)(void*)){
+void linkedListForEach(const LinkedList* list, void (*func)(void*)) {
     // Verifica se a lista está vazia ou se a função é inválida
-    if(listIsEmpty(list) || func == NULL) {
+    if (listIsEmpty(list) || func == NULL) {
         printf("Erro. A lista esta vazia ou a funcao passada e invalida.\n");
         return;
     }
 
-    struct ListNode *curr = list->head;
+    struct ListNode* curr = list->head;
 
     // Itera sobre os nós da lista executando a função
-    while(curr != NULL){
+    while (curr != NULL) {
         func(curr->data);
         curr = curr->next;
     }
