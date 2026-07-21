@@ -10,8 +10,9 @@ typedef struct Vector {
 
 Vector* vectorCreate(const unsigned int initial_capacity, const unsigned int item_size);
 void vectorPushBack(Vector* vector, const void* value);
-void* vectorGet(const Vector* vector, int index);
-void vectorSet(const Vector* vector, int index, const void* value);
+void* vectorGet(const Vector* vector, const unsigned int index);
+void vectorSet(const Vector* vector, const unsigned int index, const void* value);
+void vectorErase(Vector* vector, const unsigned int index);
 int vectorSize(const Vector* vector);
 int vectorCapacity(const Vector* vector);
 void vectorFree(Vector* vector);

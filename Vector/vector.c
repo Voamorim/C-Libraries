@@ -53,7 +53,7 @@ void vectorPushBack(Vector* vector, const void* value) {
     vector->size += 1;
 }
 
-void* vectorGet(const Vector* vector, int index) {
+void* vectorGet(const Vector* vector, const unsigned int index) {
     if (vector == NULL) {
         perror("[vector.c][vectorGet()] WARNING: Vector object does not exist.\n");
         return NULL;
@@ -67,7 +67,7 @@ void* vectorGet(const Vector* vector, int index) {
     return (char*)vector->data + index * vector->item_size;
 }
 
-void vectorSet(Vector* vector, int index, const void* value) {
+void vectorSet(Vector* vector, const unsigned int index, const void* value) {
     if (vector == NULL) {
         perror("[vector.c][vectorSet()] WARNING: Vector object does not exist.\n");
         return;
@@ -80,6 +80,25 @@ void vectorSet(Vector* vector, int index, const void* value) {
     // Calculates the to be modified item address
     char* dest = (char*)vector->data + index * vector->item_size;
     memcpy(dest, value, vector->item_size);
+}
+
+void vectorErase(Vector* vector, const unsigned int index) {
+    if (vector == NULL) {
+        perror("[vector.c][vectorErase()] WARNING: Vector object does not exist.\n");
+        return;
+    }
+
+    if (index >= vector->size) {
+        printf("[vector.c][vectorErase()] ERROR: Vector index out of bounds.\n");
+        return;
+    }
+
+    // Moves next items backwards
+    for (int i = index + 1; i < vector->size; ++i) {
+        vectorSet(vector, i - 1, vector->data + vector->item_size * i);
+    }
+
+    vector->size -= 1;
 }
 
 int vectorSize(const Vector* vector) {
