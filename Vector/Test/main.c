@@ -9,6 +9,7 @@
 void testVector();
 
 int main(){
+    srand(time(NULL));
     int tests = 5;
 
     while(tests--)
