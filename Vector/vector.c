@@ -98,7 +98,7 @@ void vectorErase(Vector* vector, const unsigned int index) {
 }
 
 void vectorFill(Vector* vector, void* value){
-    if(vector == NULL || vector->buffer) {
+    if(!vector || !vector->buffer) {
         perror("[vector.c][vectorFill()] WARNING: Invalid argument. Vector object or buffer can't be NULL.\n");
         return;
     }
