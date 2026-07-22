@@ -62,6 +62,17 @@ void vectorSet(const Vector* vector, const unsigned int index, const void* value
 void vectorErase(Vector* vector, const unsigned int index);
 
 /**
+ * @brief Fills the entire capacity of the vector with copies of a given value.
+ *
+ * Iterates through all available capacity slots and uses `memcpy` to copy the 
+ * provided element into each index. Updates the vector's size to match its capacity.
+ *
+ * @param vector Pointer to the Vector struct.
+ * @param value Pointer to the value/data to fill the vector with.
+ */
+void vectorFill(Vector* vector, const void* value);
+
+/**
  * @brief Gets the current number of elements in the vector.
  *
  * @param vector Pointer to the Vector struct.

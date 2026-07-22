@@ -97,6 +97,25 @@ void vectorErase(Vector* vector, const unsigned int index) {
     vector->size -= 1;
 }
 
+void vectorFill(Vector* vector, const void* value){
+    if(vector == NULL || vector->buffer) {
+        perror("[vector.c][vectorFill()] WARNING: Invalid argument. Vector object or buffer can't be NULL.\n");
+        return;
+    }
+
+    if(!value){
+        perror("[vector.c][vectorFill()] WARNING: Value pointer can't be NULL.\n");
+        return;
+    }
+
+    char* destination = (char*) vector->buffer;
+    for(int i = 0; i < vector->capacity; ++i){
+        memcpy(destination + (i * vector->item_size), value, vector->item_size);
+    }
+
+    vector->size = vector->capacity;
+}
+
 int vectorSize(const Vector* vector) {
     if (vector == NULL) {
         perror("[vector.c][vectorSize()] WARNING: Vector object does not exist.\n");
