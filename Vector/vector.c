@@ -90,7 +90,7 @@ void vectorErase(Vector* vector, const unsigned int index) {
     }
 
     // Moves next items backwards
-    for (int i = index + 1; i < vector->size; ++i) {
+    for (unsigned i = index + 1; i < vector->size; ++i) {
         vectorSet(vector, i - 1, vector->buffer + vector->item_size * i);
     }
 
@@ -109,7 +109,7 @@ void vectorFill(Vector* vector, void* value){
     }
 
     char* destination = (char*) vector->buffer;
-    for(int i = 0; i < vector->capacity; ++i){
+    for(unsigned i = 0; i < vector->capacity; ++i){
         memcpy(destination + (i * vector->item_size), value, vector->item_size);
     }
 

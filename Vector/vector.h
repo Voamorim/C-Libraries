@@ -11,9 +11,9 @@
  */
 typedef struct Vector {
     void* buffer;      /**< Pointer to the allocated memory buffer storing elements. */
-    int size;        /**< Number of elements currently stored in the vector. */
-    int capacity;    /**< Total number of elements the vector can hold before reallocating. */
-    int item_size;   /**< Size in bytes of a single element (e.g., sizeof(int)). */
+    unsigned int size;        /**< Number of elements currently stored in the vector. */
+    unsigned int capacity;    /**< Total number of elements the vector can hold before reallocating. */
+    unsigned int item_size;   /**< Size in bytes of a single element (e.g., sizeof(int)). */
 } Vector;
 
 /**
@@ -51,7 +51,7 @@ void* vectorGet(const Vector* vector, const unsigned int index);
  * @param index Zero-based index where the element will be overwritten.
  * @param value Pointer to the new value to copy into the vector.
  */
-void vectorSet(const Vector* vector, const unsigned int index, void* value);
+void vectorSet(Vector* vector, const unsigned int index, void* value);
 
 /**
  * @brief Removes the element at the specified index, shifting subsequent elements left.
