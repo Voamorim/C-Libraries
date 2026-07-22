@@ -33,7 +33,7 @@ Vector* vectorCreate(const unsigned int initial_capacity, const unsigned int ite
  * @param vector Pointer to the Vector struct.
  * @param value Pointer to the value/data to copy into the vector.
  */
-void vectorPushBack(Vector* vector, const void* value);
+void vectorPushBack(Vector* vector, void* value);
 
 /**
  * @brief Retrieves a pointer to the element at the specified index.
@@ -51,7 +51,7 @@ void* vectorGet(const Vector* vector, const unsigned int index);
  * @param index Zero-based index where the element will be overwritten.
  * @param value Pointer to the new value to copy into the vector.
  */
-void vectorSet(const Vector* vector, const unsigned int index, const void* value);
+void vectorSet(const Vector* vector, const unsigned int index, void* value);
 
 /**
  * @brief Removes the element at the specified index, shifting subsequent elements left.
@@ -70,7 +70,7 @@ void vectorErase(Vector* vector, const unsigned int index);
  * @param vector Pointer to the Vector struct.
  * @param value Pointer to the value/data to fill the vector with.
  */
-void vectorFill(Vector* vector, const void* value);
+void vectorFill(Vector* vector, void* value);
 
 /**
  * @brief Gets the current number of elements in the vector.

@@ -26,7 +26,7 @@ Vector* vectorCreate(const unsigned int initial_capacity, const unsigned int ite
     return v;
 }
 
-void vectorPushBack(Vector* vector, const void* value) {
+void vectorPushBack(Vector* vector, void* value) {
     if (vector == NULL) {
         perror("[vector.c][vectorPushBack()] WARNING: Vector object does not exist.\n");
         return;
@@ -63,7 +63,7 @@ void* vectorGet(const Vector* vector, const unsigned int index) {
     return (char*)vector->buffer + index * vector->item_size;
 }
 
-void vectorSet(Vector* vector, const unsigned int index, const void* value) {
+void vectorSet(Vector* vector, const unsigned int index, void* value) {
     if (vector == NULL) {
         perror("[vector.c][vectorSet()] WARNING: Vector object does not exist.\n");
         return;
@@ -97,7 +97,7 @@ void vectorErase(Vector* vector, const unsigned int index) {
     vector->size -= 1;
 }
 
-void vectorFill(Vector* vector, const void* value){
+void vectorFill(Vector* vector, void* value){
     if(vector == NULL || vector->buffer) {
         perror("[vector.c][vectorFill()] WARNING: Invalid argument. Vector object or buffer can't be NULL.\n");
         return;
