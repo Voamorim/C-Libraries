@@ -1,6 +1,8 @@
 #include "binarytree.h"
 
-BinaryTree* createBinaryTree(const unsigned item_size, int(*compare(const void*, const void*))){
+void freeBinaryTreeNode(BinaryTreeNode *node);
+
+BinaryTree* createBinaryTree(const unsigned item_size, int(*compare)(const void*, const void*)){
     if (item_size == 0) {
         fprintf(stderr, "[binarytree.c][createBinaryTree()] WARNING: item_size can't be equal to 0.\n");
         return NULL;
@@ -26,7 +28,7 @@ BinaryTree* createBinaryTree(const unsigned item_size, int(*compare(const void*,
     return tree;
 }
 
-BinaryTree* createBinaryTreeNode(const void* data, const unsigned item_size, BinaryTreeNode* parent){
+BinaryTreeNode* createBinaryTreeNode(const void* data, const unsigned item_size, BinaryTreeNode* parent){
     BinaryTreeNode* node = (BinaryTreeNode*) malloc (sizeof(BinaryTreeNode));
 
     if(!node){
@@ -72,7 +74,7 @@ bool insertNodeBinaryTree(BinaryTree *tree, const void* data){
 
     BinaryTreeNode *curr = tree->root;
     while(1){
-        int comparison = tree->compare(curr->data, data);
+        int comparison = tree->compare(data, curr->data);
 
         if(comparison == 0) return false;
 
@@ -80,7 +82,7 @@ bool insertNodeBinaryTree(BinaryTree *tree, const void* data){
             if(curr->left) 
                 curr = curr->left;
             else {
-                BinaryTreeNode* new_node = createbinarytreenode(data, tree->item_size, curr);
+                BinaryTreeNode* new_node = createBinaryTreeNode(data, tree->item_size, curr);
                 if(!new_node) return false;
 
                 curr->left = new_node;
@@ -91,7 +93,7 @@ bool insertNodeBinaryTree(BinaryTree *tree, const void* data){
             if(curr->right) 
                 curr = curr->right;
             else {
-                BinaryTreeNode* new_node = createbinarytreenode(data, tree->item_size, curr);
+                BinaryTreeNode* new_node = createBinaryTreeNode(data, tree->item_size, curr);
                 if(!new_node) return false;
 
                 curr->right = new_node;
@@ -120,7 +122,7 @@ void* findNodeBinaryTree(BinaryTree *tree, const void* data){
 
     BinaryTreeNode *curr = tree->root;
     while(curr){
-        int comparison = tree->compare(curr->data, data);
+        int comparison = tree->compare(data, curr->data);
         
         if(comparison == 0) return curr;
 
@@ -151,11 +153,9 @@ bool eraseNodeBinaryTree(BinaryTree *tree, const void* data){
     BinaryTreeNode *curr = tree->root;
 
     while(curr){
-        int comparison = tree->compare(curr->data, data);
+        int comparison = tree->compare(data, curr->data);
 
-        if(comparison == 0){
-            break;
-        }
+        if(comparison == 0) break;
 
         if(comparison < 0) 
             curr = curr->left;
@@ -195,7 +195,8 @@ bool eraseNodeBinaryTree(BinaryTree *tree, const void* data){
         }
         
         tree->nnodes -= 1;
-        freeBinaryTreeNode(curr);
+        if(curr->data) free(curr->data);
+        free(curr);
         return true;
     }
 
@@ -209,7 +210,9 @@ bool eraseNodeBinaryTree(BinaryTree *tree, const void* data){
         tree->root = NULL;
     }
     tree->nnodes -= 1;
-    freeBinaryTreeNode(curr);
+
+    if(curr->data) free(curr->data);
+    free(curr);
     return true;
 }
 
