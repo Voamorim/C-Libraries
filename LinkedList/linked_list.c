@@ -1,21 +1,26 @@
 #include "linked_list.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-
-int listIsEmpty(const LinkedList* list) {
-    return list == NULL || list->head == NULL || list->size == 0;
+bool listIsEmpty(const LinkedList* list) {
+    if(!list){
+        fprintf(stderr, "[linked_list.c][listIsEmpty()] WARNING: List pointer is NULL.\n");
+        return true;
+    }
+    return list->size == 0;
 }
 
-int listSize(const LinkedList* list) { return list == NULL ? 0 : list->size; }
+unsigned listSize(const LinkedList* list) { 
+    if(!list){
+        fprintf(stderr, "[linked_list.c][listSize()] WARNING: List pointer is NULL.\n");
+        return 0;
+    }
+    return list->size; 
+}
 
 LinkedList* createList(void) {
-    // Cria uma nova lista encadeada e insere um nó inicial nela
     LinkedList* new_list = (LinkedList*)malloc(sizeof(LinkedList));
 
-    // Verifica se foi possível alocar memória para a lista encadeada
     if (new_list == NULL) {
-        printf("Erro ao alocar memoria para lista encadeada.");
+        perror("[linked_list.c][createList()] ERROR: Failed to allocate memory for Linked List data structure.\n");
         return NULL;
     }
 
@@ -27,13 +32,15 @@ LinkedList* createList(void) {
 }
 
 void freeList(LinkedList* list) {
-    // Verifica se a lista já se encontra vazia
-    if (list == NULL) return;
+    if (!list){
+        fprintf(stderr, "[linked_list.c][freeList()] WARNING: List pointer is NULL.\n");
+        return;
+    } 
 
     struct ListNode* curr = list->head;
     struct ListNode* next;
 
-    // Realiza a remoção dos nós a partir do início
+    // Removes nodes starting from the beginning 
     while (curr != NULL) {
         next = curr->next;
         free(curr);
@@ -44,14 +51,16 @@ void freeList(LinkedList* list) {
 }
 
 void freeListComplete(LinkedList* list, void (*freeData)(void*)) {
-    // Verifica se a função passada é válida
-    if (freeData == NULL) {
-        printf("Erro. A funcao passada nao e valida.\n");
+    if (!list){
+        fprintf(stderr, "[linked_list.c][freeListComplete()] WARNING: List pointer is NULL.\n");
+        return;
+    } 
+   
+    // Checks if the provided function pointer is valid
+    if (!freeData) {
+        fprintf(stderr, "[linked_list.c][freeListComplete()] ERROR: Invalid pointer to free function.\n");
         return;
     }
-
-    // Verifica se a lista já se encontra vazia
-    if (list == NULL) return;
 
     struct ListNode* curr = list->head;
     struct ListNode* next;
@@ -59,8 +68,9 @@ void freeListComplete(LinkedList* list, void (*freeData)(void*)) {
     while (curr != NULL) {
         next = curr->next;
 
-        // Verifica se o dado armazenado existe
-        if (curr->data != NULL) freeData(curr->data);
+        // Checks if the stored data exists 
+        if (curr->data != NULL) 
+            freeData(curr->data);
 
         free(curr);
         curr = next;
@@ -70,56 +80,60 @@ void freeListComplete(LinkedList* list, void (*freeData)(void*)) {
 }
 
 void linkedListPushBack(LinkedList* list, void* data) {
-    struct ListNode* new_node = (struct ListNode*)malloc(sizeof(struct ListNode));
+    if(!list){
+        fprintf(stderr, "[linked_list.c][linkedListPushBack()] ERROR: List pointer is NULL.\n");
+        return;
+    }
+   
+    // If the list is empty, delegate directly to push front to avoid useless
+    // allocation    
+    if(list->tail == NULL){
+        linkedListPushFront(list, data);
+        return;
+    }
 
-    // Verifica se o novo nó foi alocado com sucesso
+    struct ListNode* new_node = (struct ListNode*)malloc(sizeof(struct ListNode));
+    
     if (new_node == NULL) {
-        printf("Erro ao alocar memoria para um novo no.\n");
+        perror("[linked_list.c][linkedListPushBack()] ERROR: Failed to allocate memory for Linked List node.\n");
         return;
     }
 
     struct ListNode* curr = list->tail;
+    curr->next = new_node;
 
-    // Verifica se existe algum nó na lista
-    if (curr) {
-        curr->next = new_node;
+    new_node->data = data;
+    new_node->next = NULL;
+    new_node->previous = curr;
 
-        new_node->data = data;
-        new_node->next = NULL;
-        new_node->previous = curr;
-
-        list->tail = new_node;
-
-        list->size += 1;
-    } else {
-        // Caso a lista não possua nó cabeça, é chamada linkedListPushFront para
-        // fazer a inserção no início
-
-        free(new_node);  // Libera o nó alocado anteriormente
-        linkedListPushFront(list, data);
-    }
+    list->tail = new_node;
+    list->size += 1;
+    return;
 }
 
 void linkedListPushFront(LinkedList* list, void* data) {
-    struct ListNode* new_node = (struct ListNode*)malloc(sizeof(struct ListNode));
-
-    // Verifica se a memória foi alocada com sucesso para o novo nó
-    if (new_node == NULL) {
-        printf("Erro ao alocar memoria para um novo no.\n");
+    if(!list){
+        fprintf(stderr, "[linked_list.c][linkedListPushFront()] ERROR: List pointer is NULL\n");
         return;
     }
 
-    new_node->previous = NULL;  // Nó cabeça não possui antecessor
+    struct ListNode* new_node = (struct ListNode*) malloc (sizeof(struct ListNode));
+
+    if (new_node == NULL) {
+        perror("[linked_list.c][linkedListPushFront()] ERROR: Failed to allocate memory for Linked List node.\n");
+        return;
+    }
+
+    new_node->previous = NULL;  // Head node has no predecessor 
     new_node->data = data;
 
-    // Verifica se a lista possuí um nó cabeça
+    // Checks if the list has no head node 
     if (list->head) {
         new_node->next = list->head;
         list->head->previous = new_node;
         list->head = new_node;
-
     } else {
-        // Caso não tenha nó cabeça, insere o primeiro nó na lista
+        // If it does not have a head node, inserts the first node into the list 
         new_node->next = NULL;
         list->head = new_node;
         list->tail = new_node;
@@ -129,19 +143,23 @@ void linkedListPushFront(LinkedList* list, void* data) {
 }
 
 void* linkedListPopFront(LinkedList* list) {
-    if (listIsEmpty(list)) {
-        printf("Erro ao tentar remover em uma lista vazia.\n");
+    if(!list){
+        fprintf(stderr, "[linked_list.c][linkedListPopFront()] ERROR: List pointer is NULL.\n");
+        return NULL;
+    }
+
+    if(listIsEmpty(list)){
+        fprintf(stderr, "[linked_list.c][linkedListPopFront()] WARNING: Failed to pop front node. List is empty.\n");
         return NULL;
     }
 
     struct ListNode* curr = list->head;
     list->head = list->head->next;
 
-    // Verifica se o posterior ao nó cabeça existe
+    // Checks if the node following the head node exists 
     if (list->head != NULL) {
-        // Faz com que o novo nó cabeça não aponte para nenhum anterior
+        // Ensures the new head node does not point to any previous node 
         list->head->previous = NULL;
-
         list->size -= 1;
     } else {
         list->tail = NULL;
@@ -154,15 +172,19 @@ void* linkedListPopFront(LinkedList* list) {
 }
 
 void* linkedListPopBack(LinkedList* list) {
-    // Verifica se a lista está vazia
-    if (listIsEmpty(list)) {
-        printf("Erro ao remover no da lista. A lista esta vazia.\n");
+    if(!list){
+        fprintf(stderr, "[linked_list.c][linkedListPopBack()] ERROR: List pointer is NULL.\n");
+        return NULL;
+    }
+
+    if(listIsEmpty(list)){
+        fprintf(stderr, "[linked_list.c][linkedListPopBack()] WARNING: Failed to pop back node. List is empty.\n");
         return NULL;
     }
 
     struct ListNode* curr = list->tail;
 
-    // Verifica se o último nó da lista possui antecessor
+    // Checks if the last node of the list has a predecessor 
     if (curr->previous) {
         void* data = curr->data;
         curr = curr->previous;
@@ -183,34 +205,43 @@ void* linkedListPopBack(LinkedList* list) {
 }
 
 void* linkedListPopNode(LinkedList* list, struct ListNode* target) {
-    // Verifica se a lista está vazia
-    if (listIsEmpty(list)) {
-        printf("Erro ao tentar remover no da lista. A lista esta vazia.\n");
+    if(!list){
+        fprintf(stderr, "[linked_list.c][linkedListPopNode()] ERROR: List pointer is NULL.\n");
+        return NULL;
+    }
+
+    if(!target){
+        fprintf(stderr, "[linked_list.c][linkedListPopNode()] ERROR: Target node pointer is NULL.\n");
+        return NULL;
+    }
+
+    if(listIsEmpty(list)){
+        fprintf(stderr, "[linked_list.c][linkedListPopNode()] WARNING: Failed to pop target node. List is empty.\n");
         return NULL;
     }
 
     struct ListNode* curr;
 
-    // Caso o nó a ser removido esteja entre dois nós existentes
+    // If the node to be removed is between two existing nodes
     if (target->next && target->previous) {
-        // Faz os nós entre o nó a ser removido apontarem um para o outro
+        // Makes the surrounding nodes point to each other 
         curr = target->next;
         target->previous->next = curr;
         curr->previous = target->previous;
-
     } else if (target->next) {
-        // Se o nó a ser removido apenas possuir posterior, ele é o nó cabeça
+        // If the node to be removed only has a next node, it's the head node 
         list->head = target->next;
         list->head->previous = NULL;
     } else if (target->previous) {
-        // Se o nó a ser removido possuir apenas anterior, ele é o nó final
-        // da lista
+        // If the node to be removed only has a previous node, it's the tail node
+        // of the list
         target->previous->next = NULL;
         list->tail = target->previous;
     } else {
-        // Caso o nó não possuir antecessor nem posterior, ele é o último nó
-        // da lista
+        // If the node has neither a predecessor nor a sucessor, it's the last
+        // remaining node in the list 
         list->head = NULL;
+        list->tail = NULL;
     }
 
     void* data = target->data;
@@ -221,16 +252,133 @@ void* linkedListPopNode(LinkedList* list, struct ListNode* target) {
     return data;
 }
 
-void linkedListForEach(const LinkedList* list, void (*func)(void*)) {
-    // Verifica se a lista está vazia ou se a função é inválida
-    if (listIsEmpty(list) || func == NULL) {
-        printf("Erro. A lista esta vazia ou a funcao passada e invalida.\n");
+void* linkedListGet(LinkedList* list, unsigned pos){
+    if(!list){
+        fprintf(stderr, "[linked_list.c][linkedListGet()] ERROR: List pointer is NULL.\n");
+        return NULL;
+    }
+
+    if(pos >= list->size){
+        fprintf(stderr, "[linked_list.c][linkedListGet()] WARNING: Index out of bounds.\n");
+        return NULL;
+    }
+
+    struct ListNode* curr;
+
+    // Optimize traversal direction based on position
+    if(pos < list->size / 2){
+        curr = list->head;
+        for(unsigned i = 0; i < pos; ++i){
+            curr = curr->next;
+        }
+    } else {
+        curr = list->tail;
+        for(unsigned i = list->size - 1; i > pos; --i){
+            curr = curr->previous;
+        }
+    }
+
+    return curr->data;
+}
+
+void linkedListInsertAt(LinkedList* list, void* data, unsigned pos){
+    if(!list){
+        fprintf(stderr, "[linked_list.c][linkedListInsertAt()] ERROR: List pointer is NULL.\n");
         return;
     }
 
+    if(pos > list->size){
+        fprintf(stderr, "[linked_list.c][linkedListInsertAt()] WARNING: Index out of bounds.\n");
+        return;
+    }
+
+    // Delegate head insertion
+    if(pos == 0){
+        linkedListPushFront(list, data);
+        return;
+    }
+
+    // Delegate tail insertion
+    if(pos == list->size){
+        linkedListPushBack(list, data);
+        return;
+    }
+
+    ListNode* new_node = (ListNode*) malloc (sizeof(ListNode));
+
+    if(new_node == NULL){
+        fprintf(stderr, "[linked_list.c][linkedListInsertAt()] ERROR: Failed to allocate memory for Linked List node.\n");
+        return;
+    }
+
+    // Traverse to the node currently at pos
+    ListNode* target;
+    if(pos < list->size / 2){
+        target = list->head;
+        for(unsigned i = 0; i < pos; ++i){
+            target = target->next;
+        }
+    } else {
+        target = list->tail;
+        for(unsigned i = list->size - 1; i > pos; --i){
+            target = target->previous;
+        }
+    }
+
+    new_node->data = data;
+    new_node->previous = target->previous;
+    new_node->next = target;
+    
+    target->previous->next = new_node;
+    target->previous = new_node;
+
+    list->size += 1;
+}
+
+int linkedListFind(const LinkedList* list, const void* target_data, int(*compare)(const void*, const void*)){
+    if(!list){
+        fprintf(stderr, "[linked_list.c][linkedListFind()] ERROR: List pointer is NULL.\n");
+        return -1;
+    }
+
+    if(!compare){
+        fprintf(stderr, "[linked_list.c][linkedListFind()] ERROR: Compare function pointer is NULL.\n");
+        return -1;
+    }
+
+    if(listIsEmpty(list)) return -1;
+
+    ListNode* curr = list->head;
+    int idx = 0;
+
+    while(curr != NULL){
+        if(compare(curr->data, target_data) == 0){
+            return idx;
+        }
+        curr = curr->next;
+        idx += 1;
+    }
+    return -1;
+}
+
+void linkedListForEach(const LinkedList* list, void (*func)(void*)) {
+    if(!list){
+        fprintf(stderr, "[linked_list.c][linkedListForEach()] WARNING: List pointer is NULL.\n");
+        return;
+    }
+
+    if(!func){
+        fprintf(stderr, "[linked_list.c][linkedListForEach()] ERROR: Function pointer is NULL.\n");
+    }
+
+    if(listIsEmpty(list)){
+        fprintf(stderr, "[linked_list.c][linkedListForEach()] WARNING: Failed to perform for each. List is empty.\n");
+        return;
+    }
+   
     struct ListNode* curr = list->head;
 
-    // Itera sobre os nós da lista executando a função
+    // Iterated through the list node executing the function 
     while (curr != NULL) {
         func(curr->data);
         curr = curr->next;
